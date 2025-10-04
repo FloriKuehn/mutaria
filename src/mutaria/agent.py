@@ -23,12 +23,13 @@ class Agent:
         self.id = id
         self.position = position
 
-    def move_randomly(self, world):
+    def act(self, world):
         """
-        Moves the agent to a random adjacent position in the world.
+        Defines the agent's behavior for a simulation step.
+        For now, the agent moves randomly.
 
         Args:
-            world: The world in which the agent exists.
+            world (World): The world in which the agent exists.
         """
 
         x, y = self.position
