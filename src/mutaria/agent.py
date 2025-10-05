@@ -26,7 +26,7 @@ class Agent:
     def act(self, world):
         """
         Defines the agent's behavior for a simulation step.
-        For now, the agent moves randomly.
+        For now, the agent moves randomly to an unoccupied adjacent cell.
 
         Args:
             world (World): The world in which the agent exists.
