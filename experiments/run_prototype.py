@@ -12,15 +12,15 @@ from mutaria.visualizer import Visualizer
 
 def main():
     sim = Simulator(
-        width=8,
-        height=8,
-        num_agents=5,
+        width=512,
+        height=512,
+        num_agents=1000,
         generations=10,
         steps_per_generation=100
     )
     visualizer = Visualizer(
         video_out_path="output/prototype_simulation.mp4",
-        cell_size=100
+        cell_size=1
         )
 
     sim.populate_world()
@@ -28,7 +28,16 @@ def main():
         for step in range(sim.steps_per_generation):
             sim.simulate_step()
             visualizer.render_step(sim.world, generation, step)
+
+        # Before repopulating, clear the right half of the world
+        for y in range(sim.world.height):
+            for x in range(sim.world.width // 2, sim.world.width):
+                agent = sim.world.grid[y, x]
+                if agent is not None:
+                    sim.world.grid[y, x] = None
+                    sim.agents.remove(agent)
         sim.reproduce_population()
+        print(f"Completed generation {generation}")
     visualizer.close()
 
 

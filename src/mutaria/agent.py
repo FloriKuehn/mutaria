@@ -7,21 +7,32 @@ simulation.
 
 import random
 
+from mutaria.genome import Genome
+
 
 class Agent:
     """
     Represents an individual agent in the simulation.
     """
 
-    def __init__(self, id: int, position: tuple[int, int] = (0, 0)):
+    def __init__(
+            self,
+            id: int,
+            genome: Genome = Genome(),
+            position: tuple[int, int] = (0, 0)
+            ):
         """
-        Initializes the agent with a unique ID.
+        Initializes the agent with a unique ID and a genome.
 
         Args:
             id (int): Unique identifier for the agent.
+            genome (Genome): The genome of the agent.
+            position (tuple[int, int]): The (x, y) position of the agent in
+                the world.
         """
         self.id = id
         self.position = position
+        self.genome = genome
 
     def act(self, world):
         """
@@ -50,3 +61,11 @@ class Agent:
         if valid_moves:
             new_position = random.choice(valid_moves)
             world.move_agent(self, new_position)
+
+    def reproduce(self, child_id: int):
+        """
+        Creates a new agent as a child of this agent.
+        Needs to be passed a unique ID for the child agent.
+        """
+        child_genome = self.genome.mutate()
+        return Agent(child_id, genome=child_genome)

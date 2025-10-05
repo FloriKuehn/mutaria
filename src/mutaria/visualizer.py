@@ -50,7 +50,7 @@ class Visualizer:
                             y * self.cell_size)
                 bottom_right = ((x + 1) * self.cell_size,
                                 (y + 1) * self.cell_size)
-                draw.rectangle([top_left, bottom_right], outline="black")
+                # draw.rectangle([top_left, bottom_right], outline="black")
 
                 agent = world.grid[y, x]
                 if agent is not None:

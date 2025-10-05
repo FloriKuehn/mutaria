@@ -59,6 +59,17 @@ class Simulator:
         Repopulates the world with new agents.
         Used at the end of each generation.
         """
-        self.world.agents.clear()
+        parents = list(self.world.agents)
+        children = []
         self.world.grid.fill(None)
-        self.populate_world()
+
+        if not parents:
+            self.populate_world()
+            return
+
+        for parent in parents:
+            child = parent.reproduce(len(children))
+            children.append(child)
+            self.world.add_agent(child, self.world._find_empty_cell())
+
+        self.world.agents = children
