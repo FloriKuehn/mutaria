@@ -21,10 +21,9 @@ class Genome:
         Each gene is represented as a hexadecimal string.
         """
         self.n_genes = params['n_genes']
-        self.mutation_rate = params['mutation_rate']
         self.genes = [self._get_random_gene() for _ in range(self.n_genes)]
 
-    def _get_random_gene(self) -> str:
+    def _get_random_gene(self):
         """
         Generates a random gene represented as an 8-char
         hexadecimal string.
@@ -34,7 +33,7 @@ class Genome:
         """
         return ''.join(random.choices('0123456789abcdef', k=8))
 
-    def mutate(self) -> 'Genome':
+    def mutate(self, mutation_rate=config['mutation_rate']) -> 'Genome':
         """
         Creates a mutated copy of the genome.
 
@@ -47,11 +46,12 @@ class Genome:
         """
         new_genome = Genome()
         new_genome.genes = []
+        mutation_rate = mutation_rate
 
         for gene in self.genes:
             new_gene = ''.join(
-                char if random.random() > self.mutation_rate
-                else random.choice('0123456789abcdef')
+                char if random.random() > mutation_rate else
+                random.choice('0123456789abcdef')
                 for char in gene
             )
             new_genome.genes.append(new_gene)

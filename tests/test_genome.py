@@ -1,30 +1,31 @@
 import random
 
 from mutaria.genome import Genome
+from mutaria.params import config
 
 
 def test_genome_initialization():
-    genome = Genome(n_genes=3, gene_length=4)
-    assert len(genome.genes) == 3
+    genome = Genome()
+    assert len(genome.genes) == config['n_genes']
     for gene in genome.genes:
-        assert len(gene) == 4
+        assert len(gene) == 8
         assert all(c in '0123456789abcdef' for c in gene)
 
 
 def test_genome_mutation():
     random.seed(42)
-    genome = Genome(n_genes=2, gene_length=4)
+    genome = Genome()
     original_genes = genome.genes.copy()
     mutated_genome = genome.mutate(mutation_rate=0.5)
-    assert len(mutated_genome.genes) == 2
+    assert len(mutated_genome.genes) == len(original_genes)
     for original, mutated in zip(original_genes, mutated_genome.genes):
-        assert len(mutated) == 4
+        assert len(mutated) == len(original)
         assert any(o != m for o, m in zip(original, mutated))
 
 
 def test_genome_mutation_extremes():
     random.seed(42)
-    genome = Genome(n_genes=1, gene_length=4)
+    genome = Genome()
     no_mutation_genome = genome.mutate(mutation_rate=0.0)
     assert no_mutation_genome.genes == genome.genes
 
