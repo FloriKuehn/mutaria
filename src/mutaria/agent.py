@@ -55,7 +55,7 @@ class Agent:
             (new_x, new_y) for new_x, new_y in possible_moves
             if 0 <= new_x < world.width
             and 0 <= new_y < world.height
-            and world.grid[new_y, new_x] is None
+            and world.is_empty_at((new_x, new_y))
         ]
 
         if valid_moves:

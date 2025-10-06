@@ -7,28 +7,47 @@ agents.
 
 import numpy as np
 
-from mutaria.agent import Agent
+from mutaria.params import config
 
 
 class World:
     """
     Represents a 2D grid world where agents can evolve and interact.
+    The world is defined by its width and height, and contains a grid where
+    each cell can be empty or occupied by an agent.
+    Empty cells are represented by 0, and occupied cells by the agent's ID.
     """
 
-    def __init__(self, width: int, height: int):
+    def __init__(self, params=config):
         """
         Initializes the world with given dimensions.
-
-        Args:
-            width (int): Width of the world.
-            height (int): Height of the world.
         """
-        self.width = width
-        self.height = height
-        self.grid = np.full((height, width), None)
+        self.size = params['world_size']
+        self.width, self.height = self.size
+        self.grid = np.zeros((self.height, self.width))
         self.agents = []
 
-    def _find_empty_cell(self) -> tuple[int, int]:
+    def reset(self):
+        """
+        Resets the world to its initial empty state.
+        """
+        self.grid = np.zeros((self.height, self.width))
+        self.agents = []
+
+    def is_empty_at(self, position: tuple[int, int]) -> bool:
+        """
+        Checks if a given position in the grid is empty.
+
+        Args:
+            position (tuple[int, int]): The (x, y) coordinates to check.
+
+        Returns:
+            Bool: True if the cell is empty, False otherwise.
+        """
+        x, y = position
+        return self.grid[x, y] == 0
+
+    def find_empty_cell(self) -> tuple[int, int]:
         """
         Finds a random empty cell in the grid.
 
@@ -36,13 +55,15 @@ class World:
             A tuple (x, y) representing the coordinates of an empty cell,
             or None if no empty cell is available.
         """
+        if np.all(self.grid != 0):
+            raise ValueError("No empty cells available in the world.")
         while True:
             x = np.random.randint(0, self.width - 1)
             y = np.random.randint(0, self.height - 1)
-            if self.grid[y, x] is None:
+            if self.is_empty_at((x, y)):
                 return (x, y)
 
-    def add_agent(self, agent: Agent, position: tuple[int, int]):
+    def add_agent(self, agent, position: tuple[int, int]):
         """
         Adds an agent to the world at the specified position.
 
@@ -51,11 +72,11 @@ class World:
             position (tuple[int, int]): The (x, y) position to place the agent.
         """
         x, y = position
-        self.grid[y, x] = agent
+        self.grid[y, x] = agent.id
         self.agents.append(agent)
         agent.position = position
 
-    def move_agent(self, agent: Agent, new_position: tuple[int, int]):
+    def move_agent(self, agent, new_position: tuple[int, int]):
         """
         Moves an agent to a new position in the world.
 
@@ -66,8 +87,8 @@ class World:
         """
         old_x, old_y = agent.position
         new_x, new_y = new_position
-        self.grid[old_y, old_x] = None
-        self.grid[new_y, new_x] = agent
+        self.grid[old_y, old_x] = 0
+        self.grid[new_y, new_x] = agent.id
         agent.position = new_position
 
     def render_array(self) -> np.ndarray:

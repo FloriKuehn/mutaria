@@ -9,18 +9,15 @@ import numpy as np
 from PIL import Image, ImageDraw
 import imageio
 
+from mutaria.params import config
+
 
 class Visualizer:
     """
     Handles the graphical representation of the simulation.
     """
 
-    def __init__(
-            self,
-            video_out_path: str,
-            cell_size: int = 8,
-            fps: int = 10
-            ):
+    def __init__(self, params=config):
         """
         Initializes the visualizer.
 
@@ -29,8 +26,9 @@ class Visualizer:
             cell_size (int): Size of each cell in pixels.
             fps (int): Frames per second for the output video.
         """
-        self.writer = imageio.get_writer(video_out_path, fps=fps)
-        self.cell_size = cell_size
+        self.writer = imageio.get_writer(params['video_out_path'],
+                                         fps=params['fps'])
+        self.cell_size = params['video_scale']
 
     def render_step(self, world, generation: int = 0, step: int = 0):
         """
@@ -53,7 +51,7 @@ class Visualizer:
                 # draw.rectangle([top_left, bottom_right], outline="black")
 
                 agent = world.grid[y, x]
-                if agent is not None:
+                if agent != 0:
                     agent_color = (0, 0, 255)  # Blue for agents
                     draw.ellipse([top_left, bottom_right], fill=agent_color)
 

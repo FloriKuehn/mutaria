@@ -7,6 +7,7 @@ the world, the agents and all simulation steps.
 
 from mutaria.world import World
 from mutaria.agent import Agent
+from mutaria.params import config
 
 
 class Simulator:
@@ -14,29 +15,14 @@ class Simulator:
     Orchestrates the simulation by managing the world and agents.
     """
 
-    def __init__(self,
-                 width: int,
-                 height: int,
-                 num_agents: int,
-                 generations: int,
-                 steps_per_generation: int
-                 ):
+    def __init__(self, params=config):
         """
         Initializes the simulation with a world and a set of agents.
-
-        Args:
-            width (int): Width of the world.
-            height (int): Height of the world.
-            num_agents (int): Number of agents to create in the simulation.
-                The world is repopulated with this many agents at the start of
-                each generation.
-            generations (int): Number of generations to simulate.
-            steps_per_generation (int): Number of steps per generation.
         """
-        self.world = World(width, height)
-        self.num_agents = num_agents
-        self.generations = generations
-        self.steps_per_generation = steps_per_generation
+        self.world = World()
+        self.num_agents = params['population_size']
+        self.generations = params['n_generations']
+        self.steps_per_generation = params['steps_per_generation']
 
     def populate_world(self):
         """
@@ -45,7 +31,7 @@ class Simulator:
         """
         self.agents = [Agent(id=i) for i in range(self.num_agents)]
         for agent in self.agents:
-            self.world.add_agent(agent, self.world._find_empty_cell())
+            self.world.add_agent(agent, self.world.find_empty_cell())
 
     def simulate_step(self):
         """
@@ -59,17 +45,29 @@ class Simulator:
         Repopulates the world with new agents.
         Used at the end of each generation.
         """
-        parents = list(self.world.agents)
-        children = []
-        self.world.grid.fill(None)
-
-        if not parents:
+        # Check for survivors
+        if len(self.agents) == 0:
             self.populate_world()
             return
 
-        for parent in parents:
-            child = parent.reproduce(len(children))
-            children.append(child)
-            self.world.add_agent(child, self.world._find_empty_cell())
+        # Create new agents from existing ones
+        parents = self.agents.copy()
+        children = []
 
-        self.world.agents = children
+        for parent in parents:
+            child_id = parent.id
+            child = parent.reproduce(child_id)
+            children.append(child)
+
+        # If not enough children, fill with random agents
+        while len(children) < self.num_agents:
+            new_id = len(children)
+            child = Agent(id=new_id)
+            children.append(child)
+
+        # Clear the world and add children
+        self.world.reset()
+        self.agents = children
+
+        for agent in self.agents:
+            self.world.add_agent(agent, self.world.find_empty_cell())

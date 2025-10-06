@@ -8,34 +8,33 @@ string.
 
 import random
 
+from mutaria.params import config
+
 
 class Genome:
     """
     Class representing a genome composed of multiple genes.
     """
-    def __init__(self, n_genes=1, gene_length=8):
+    def __init__(self, params=config):
         """
         Creates a genome with the specified number of genes and gene length.
         Each gene is represented as a hexadecimal string.
-
-        Args:
-            n_genes (int): Number of genes in the genome.
-            gene_length (int): Length of each gene in hexadecimal characters.
         """
-        self.n_genes = n_genes
-        self.gene_length = gene_length
-        self.genes = [self._random_gene() for _ in range(n_genes)]
+        self.n_genes = params['n_genes']
+        self.mutation_rate = params['mutation_rate']
+        self.genes = [self._get_random_gene() for _ in range(self.n_genes)]
 
-    def _random_gene(self) -> str:
+    def _get_random_gene(self) -> str:
         """
-        Generates a random gene represented as a hexadecimal string.
+        Generates a random gene represented as an 8-char
+        hexadecimal string.
 
         Returns:
             A hexadecimal string representing the gene.
         """
-        return ''.join(random.choices('0123456789abcdef', k=self.gene_length))
+        return ''.join(random.choices('0123456789abcdef', k=8))
 
-    def mutate(self, mutation_rate=0.01) -> 'Genome':
+    def mutate(self) -> 'Genome':
         """
         Creates a mutated copy of the genome.
 
@@ -46,12 +45,12 @@ class Genome:
         Returns:
             A new Genome instance with mutations applied.
         """
-        new_genome = Genome(self.n_genes, self.gene_length)
+        new_genome = Genome()
         new_genome.genes = []
 
         for gene in self.genes:
             new_gene = ''.join(
-                char if random.random() > mutation_rate
+                char if random.random() > self.mutation_rate
                 else random.choice('0123456789abcdef')
                 for char in gene
             )
